@@ -1,8 +1,13 @@
 <?php
 
 namespace Models;
-
-class Episode 
+ 
+class Episode
 {
+    static $table = 'episodes';
 
+    static function table()
+    {
+        return \Illuminate\Database\Capsule\Manager::table(self::$table);
+    }
 }

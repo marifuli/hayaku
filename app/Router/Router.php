@@ -210,10 +210,25 @@ class Router
                 echo $response;
             }
         }
-        else if (is_string($action) && strpos($action, '@'))
+        else 
         {
-            list($controller, $method) = explode('@', $action);
-            $class = basename($controller);
+            if (is_string($action) && strpos($action, '@'))
+            {
+                list($controller, $method) = explode('@', $action);
+                $class = basename($controller);    
+            }
+            else
+            if(is_array($action) && count($action) == 2)
+            {
+                $class = $action[0];
+                $method = $action[1];
+            }
+            else 
+            {
+                echo "Controller or method doesn't exist - From app/Router/Router.php";
+                exit;
+            }
+            
             
             // Controller delegates may use back-references to the action parameters,
             // which allows the developer to setup more flexible routes to various
@@ -239,9 +254,9 @@ class Router
             // Load the controller class file if needed.
             if (!class_exists($class))
             {
-                if (file_exists("controllers/$controller.php"))
+                if (file_exists(APP_PATH . "controllers/$controller.php"))
                 {
-                    include ("controllers/$controller.php");
+                    include (APP_PATH . "controllers/$controller.php");
                 }
             }
             

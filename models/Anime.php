@@ -4,7 +4,10 @@ namespace Models;
  
 class Anime
 {
-    public $table = 'animes';
+    static $table = 'animes';
 
-    
+    static function table()
+    {
+        return \Illuminate\Database\Capsule\Manager::table(self::$table);
+    }
 }

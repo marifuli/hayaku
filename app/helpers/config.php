@@ -2,7 +2,7 @@
 
 function config ($key = false)
 {
-    $app_config = include(APP_PATH . 'app/config/app.php');
+    $app_config = include(APP_PATH . 'config/app.php');
     if($key === false)
     {
         return $app_config;
