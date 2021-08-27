@@ -1,0 +1,13 @@
+{
+    "name": "arif/arif",
+    "description": "sergser",
+    "require": {
+        "illuminate/database": "^8.57",
+        "illuminate/events": "^8.57"
+    },
+    "autoload": {
+        "psr-4": {
+            "Models\\": "models"
+        }
+    }
+}
