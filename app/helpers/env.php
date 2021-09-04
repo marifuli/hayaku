@@ -1,13 +1,16 @@
 <?php
 
-function __env($key = false)
+if(!function_exists('__env'))
 {
-    $env = include(APP_PATH . 'env.php');
-    if($key === false)
+    function __env($key = false)
     {
-        return $env;
-    }else 
-    {
-        return $env[$key] ?? false;
-    }
+        $env = include(APP_PATH . 'env.php');
+        if($key === false)
+        {
+            return $env;
+        }else 
+        {
+            return $env[$key] ?? false;
+        }
+    }    
 }

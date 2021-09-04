@@ -16,9 +16,10 @@ $capsule->addConnection([
 	'prefix'   => '',
 ]);
 // Set the event dispatcher used by Eloquent models... (optional)
-use Illuminate\Container\Container;
 $capsule->setEventDispatcher(
-	new Illuminate\Events\Dispatcher(new Container)
+	new Illuminate\Events\Dispatcher(
+		new Illuminate\Container\Container
+		)
 );
 
 //- query builder
