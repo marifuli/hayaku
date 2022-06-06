@@ -1,6 +1,6 @@
 {
-    "name": "arif/arif",
-    "description": "sergser",
+    "name": "marifuli/hayaku",
+    "description": "A Super-Fast php framework",
     "require": {
         "illuminate/database": "^8.57",
         "illuminate/events": "^8.57"
