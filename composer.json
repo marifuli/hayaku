@@ -10,5 +10,8 @@
             "Models\\": "models",
             "Controllers\\": "controllers"
         }
+    },
+    "require-dev": {
+        "eaglewu/swoole-ide-helper": "dev-master"
     }
 }

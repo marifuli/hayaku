@@ -15,9 +15,9 @@ class Route
      * @param  mixed         $action
      * @return void
      */
-    public static function get($route, $action)
+    public static function get($route, $action, $req, $res)
     {
-        static::register('GET', $route, $action);
+        static::register('GET', $route, $action, $req, $res);
     }
 
     /**
@@ -27,9 +27,9 @@ class Route
      * @param  mixed         $action
      * @return void
      */
-    public static function post($route, $action)
+    public static function post($route, $action, $req, $res)
     {
-        static::register('POST', $route, $action);
+        static::register('POST', $route, $action, $req, $res);
     }
 
     /**
@@ -39,9 +39,9 @@ class Route
      * @param  mixed         $action
      * @return void
      */
-    public static function put($route, $action)
+    public static function put($route, $action, $req, $res)
     {
-        static::register('PUT', $route, $action);
+        static::register('PUT', $route, $action, $req, $res);
     }
 
     /**
@@ -51,9 +51,9 @@ class Route
      * @param  mixed         $action
      * @return void
      */
-    public static function delete($route, $action)
+    public static function delete($route, $action, $req, $res)
     {
-        static::register('DELETE', $route, $action);
+        static::register('DELETE', $route, $action, $req, $res);
     }
 
     /**
@@ -63,9 +63,9 @@ class Route
      * @param  mixed         $action
      * @return void
      */
-    public static function any($route, $action)
+    public static function any($route, $action, $req, $res)
     {
-        static::register('*', $route, $action);
+        static::register('*', $route, $action, $req, $res);
     }
 
     /**
@@ -76,25 +76,13 @@ class Route
      * @param  mixed         $action
      * @return void
      */
-    public static function secure($method, $route, $action)
+    public static function secure($method, $route, $action, $req, $res)
     {
         // stop when not secure
         if (!Router::secure())
             return;
         
-        static::register($method, $route, $action);
-    }
-
-    /**
-     * Register a controller with the router.
-     *
-     * @param  string|array  $controllers
-     * @param  string|array  $defaults
-     * @return void
-     */
-    public static function controller($controllers, $defaults = 'index')
-    {
-        Router::controller($controllers, $defaults);
+        static::register($method, $route, $action, $req, $res);
     }
 
     /**
@@ -105,7 +93,7 @@ class Route
      * @param  mixed         $action
      * @return void
      */
-    public static function register($method, $route, $action)
+    public static function register($method, $route, $action, $req, $res)
     {
         // If the developer is registering multiple request methods to handle
         // the URI, we'll spin through each method and register the route
@@ -114,13 +102,13 @@ class Route
         {
             foreach ($method as $http)
             {
-                Router::route($http, $route, $action);
+                Router::route($http, $route, $action, $req, $res);
             }
             return;
         }
         
         foreach ((array) $route as $uri) {
-            Router::route($method, $uri, $action);
+            Router::route($method, $uri, $action, $req, $res);
         }
     }
 

@@ -31,47 +31,20 @@ class Router
      *
      * @return string
      */
-    public static function uri()
-    {
-        if (!is_null(static::$uri))
-            return static::$uri;
-        
-        if (isset($_SERVER['REQUEST_URI']) && isset($_SERVER['SCRIPT_NAME']))
-        {
-            // Detect using REQUEST_URI, this works in most situations.
-            static::$uri = $_SERVER['REQUEST_URI'];
-            
-            // Remove equal parts with SCRIPT_NAME.
-            if (strpos(static::$uri, $_SERVER['SCRIPT_NAME']) === 0)
-            {
-                static::$uri = substr(static::$uri, strlen($_SERVER['SCRIPT_NAME']));
-            }
-            elseif (strpos(static::$uri, dirname($_SERVER['SCRIPT_NAME'])) === 0)
-            {
-                static::$uri = substr(static::$uri, strlen(dirname($_SERVER['SCRIPT_NAME'])));
-            }
-            
-            // Remove the query string.
-            if (($pos = strpos(static::$uri, '?')) !== false)
-            {
-                static::$uri = substr(static::$uri, 0, $pos);
-            }
-        }
-        else if (isset($_SERVER['PATH_INFO']))
-        {
-            // Detect URI using PATH_INFO
-            static::$uri = $_SERVER['PATH_INFO'];
-        }
+    public static function uri( $req )
+    {        
+        // Detect URI using PATH_INFO
+        $uri = $req->server['path_info'];
         
         // Remove leading and trailing slashes
-        static::$uri = trim(static::$uri, '/');
+        $uri = trim($uri, '/');
         
-        if (static::$uri == '')
+        if ($uri == '')
         {
-            static::$uri = '/';
+            $uri = '/';
         }
         
-        return static::$uri;
+        return $uri;
     }
 
     /**
@@ -105,17 +78,7 @@ class Router
      */
     public static function secure()
     {
-        return !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off';
-    }
-
-    /**
-     * Get the request method for the current request.
-     *
-     * @return string
-     */
-    public static function method()
-    {
-        return strtoupper($_SERVER['REQUEST_METHOD']);
+        return true; // !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off';
     }
 
     /**
@@ -126,17 +89,17 @@ class Router
      * @param  mixed   $action
      * @return void
      */
-    public static function route($method, $route, $action)
+    public static function route($method, $route, $action, $req, $res)
     {
         // If a previous route was matched, we can skip all routes with a lower
         // priority.
-        if (static::$routed)
-        {
-            return;
-        }
+        // if (static::$routed)
+        // {
+        //     return;
+        // }
         
         // We can ignore this route if the request method does not match
-        if ($method != '*' && strtoupper($method) != static::method())
+        if ($method != '*' && strtoupper($method) != $req->server['request_method'])
         {
             return;
         }
@@ -151,9 +114,9 @@ class Router
         // Of course literal route matches are the quickest to find, so we will
         // check for those first. If the destination key exists in the routes
         // array we can just return that route now.
-        if ($route == static::uri())
+        if ($route == static::uri($req))
         {
-            static::call($action);
+            static::call($action, [], $req, $res);
             return;
         }
         
@@ -176,9 +139,9 @@ class Router
             // If we get a match we'll return the route and slice off the first
             // parameter match, as preg_match sets the first array item to the
             // full-text match of the pattern.
-            if (preg_match('#^' . $route . '$#', static::uri(), $parameters))
+            if (preg_match('#^' . $route . '$#', static::uri($req), $parameters))
             {
-                static::call($action, array_slice($parameters, 1));
+                static::call($action, array_slice($parameters, 1), $req, $res);
                 return;
             }
         }
@@ -191,23 +154,25 @@ class Router
      * @param  mixed   $parameters
      * @return void
      */
-    private static function call($action, $parameters = array())
+    private static function call($action, $parameters = array(), $req, $res)
     {
+        $parameters[] = $req;
+        $parameters[] = $res;
         if (is_callable($action))
         {
             // The action is an anonymous function, let's execute it.
             $response = call_user_func_array($action, $parameters);
             if(is_array($response) || is_object($response))
             {
-                echo json_encode($response);
+                $res->end( json_encode($response) );
             }else 
             if(is_string($response))
             {
-                echo $response;
+                $res->end( $response );
             }
             else 
             {
-                echo $response;
+                $res->end( $response );
             }
         }
         else 
@@ -252,13 +217,13 @@ class Router
             }
             
             // Load the controller class file if needed.
-            if (!class_exists($class))
-            {
-                if (file_exists(APP_PATH . "controllers/$controller.php"))
-                {
-                    include (APP_PATH . "controllers/$controller.php");
-                }
-            }
+            // if (!class_exists($class))
+            // {
+            //     if (file_exists(APP_PATH . "controllers/$controller.php"))
+            //     {
+            //         include (APP_PATH . "controllers/$controller.php");
+            //     }
+            // }
             
             // The controller class was still not found. Let the next routes handle the
             // request.
@@ -268,47 +233,9 @@ class Router
             }
             
             $instance = new $class();
-            echo call_user_func_array(array($instance, $method), $parameters);
+            $res->end( call_user_func_array(array($instance, $method), $parameters) );
         }
         
         // The current route was matched. Ignore new routes.
-        static::$routed = TRUE;
     }
-
-    /**
-     * Match the route with a controller and execute a method
-     *
-     * @param  string|array  $controllers
-     * @param  string        $defaults
-     * @return void
-     */
-    public static function controller($controllers, $defaults = 'index')
-    {
-        foreach ((array) $controllers as $controller)
-        {
-            // If the current URI does not match this controller we can simply skip
-            // this route.
-            if (strpos(strtolower(static::uri()), strtolower($controller)) === 0)
-            {
-                // First we need to replace the dots with slashes in the controller name
-                // so that it is in directory format. The dots allow the developer to use
-                // a cleaner syntax when specifying the controller. We will also grab the
-                // root URI for the controller's bundle.
-                $controller = str_replace('.', '/', $controller);
-                
-                // Automatically passes a number of arguments to the controller method
-                $wildcards = str_repeat('/(:any?)', 6);
-                
-                // Once we have the path and root URI we can build a simple route for
-                // the controller that should handle a conventional controller route
-                // setup of controller/method/segment/segment, etc.
-                $pattern = trim($controller . $wildcards, '/');
-                
-                // Rregister the controller route with a wildcard method so it is 
-                // available on every request method.
-                static::route('*', $pattern, "$controller@(:1)");
-            }
-        }
-    }
-
 }

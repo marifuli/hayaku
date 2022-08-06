@@ -6,7 +6,7 @@ return [
     'database:host' => 'localhost:3306',
     'database:name' => 'cryanime',
     'database:user' => 'root',
-    'database:password' => '',
+    'database:password' => '12345678',
 
     
 ];

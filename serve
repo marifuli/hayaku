@@ -1,0 +1,33 @@
+<?php
+require './vendor/autoload.php';
+require './app/boot.php'; 
+require './routes/api.php';
+
+$server = new Swoole\HTTP\Server("127.0.0.1", 8081);
+
+$server->on("start", function (Swoole\Http\Server $server) {
+    echo "Swoole http server is started at http://127.0.0.1:8081\n";
+});
+
+$server->on("request", function (Swoole\Http\Request $req, Swoole\Http\Response $res) {
+    $ended = false;
+    try {
+        // define('RESPONSE', $response);
+        // $response = $res;
+        // $request = $req;
+        // $method = $req->server['request_method'];
+        // var_dump($method);exit;
+        run_api($req, $res);
+        if (getStaticFile($req, $res)) {
+            return;
+        }
+        var_dump($req->ended);
+        if(!$ended)
+        {
+            $res->end('404 - Not Found!');
+        }
+    } catch (\Throwable $th) {
+        var_dump($th);
+    }
+});
+$server->start();
