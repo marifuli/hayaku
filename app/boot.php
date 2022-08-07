@@ -1,7 +1,7 @@
 <?php 
 require 'helpers.php';
-require 'router/Route.php';
-require 'router/Router.php';
+require 'routing/Route.php';
+require 'routing/Router.php';
 
 /**
  * Setting up the DB Connection

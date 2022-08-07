@@ -1,12 +1,18 @@
 <?php 
-
-//- Documentation
-/**
- * https://github.com/WordpressDev/php-router
- */
+// https://github.com/WordpressDev/php-router
 
 class Route
 {
+    public $request = null;
+    public $response = null;
+    public $router = null;
+
+    public function __construct(Swoole\Http\Request $request, Swoole\Http\Response $response)
+    {
+        $this->response = $response;
+        $this->request = $request;
+        $this->router = new Router($request, $response);
+    }
 
     /**
      * Register a GET route with the router.
@@ -15,9 +21,9 @@ class Route
      * @param  mixed         $action
      * @return void
      */
-    public static function get($route, $action, $req, $res)
+    public function get($route, $action)
     {
-        static::register('GET', $route, $action, $req, $res);
+        $this->register('GET', $route, $action);
     }
 
     /**
@@ -27,9 +33,9 @@ class Route
      * @param  mixed         $action
      * @return void
      */
-    public static function post($route, $action, $req, $res)
+    public function post($route, $action)
     {
-        static::register('POST', $route, $action, $req, $res);
+        $this->register('POST', $route, $action);
     }
 
     /**
@@ -39,9 +45,9 @@ class Route
      * @param  mixed         $action
      * @return void
      */
-    public static function put($route, $action, $req, $res)
+    public function put($route, $action)
     {
-        static::register('PUT', $route, $action, $req, $res);
+        $this->register('PUT', $route, $action);
     }
 
     /**
@@ -51,9 +57,9 @@ class Route
      * @param  mixed         $action
      * @return void
      */
-    public static function delete($route, $action, $req, $res)
+    public function delete($route, $action)
     {
-        static::register('DELETE', $route, $action, $req, $res);
+        $this->register('DELETE', $route, $action);
     }
 
     /**
@@ -63,9 +69,9 @@ class Route
      * @param  mixed         $action
      * @return void
      */
-    public static function any($route, $action, $req, $res)
+    public function any($route, $action)
     {
-        static::register('*', $route, $action, $req, $res);
+        $this->register('*', $route, $action);
     }
 
     /**
@@ -76,13 +82,9 @@ class Route
      * @param  mixed         $action
      * @return void
      */
-    public static function secure($method, $route, $action, $req, $res)
+    public function secure($method, $route, $action)
     {
-        // stop when not secure
-        if (!Router::secure())
-            return;
-        
-        static::register($method, $route, $action, $req, $res);
+        $this->register($method, $route, $action);
     }
 
     /**
@@ -93,7 +95,7 @@ class Route
      * @param  mixed         $action
      * @return void
      */
-    public static function register($method, $route, $action, $req, $res)
+    public function register($method, $route, $action)
     {
         // If the developer is registering multiple request methods to handle
         // the URI, we'll spin through each method and register the route
@@ -102,14 +104,17 @@ class Route
         {
             foreach ($method as $http)
             {
-                Router::route($http, $route, $action, $req, $res);
+                $this->router->route($http, $route, $action);
             }
             return;
         }
         
         foreach ((array) $route as $uri) {
-            Router::route($method, $uri, $action, $req, $res);
+            $this->router->route($method, $uri, $action);
         }
     }
-
+    public function is_ended()
+    {
+        return $this->router->routed;
+    }
 }

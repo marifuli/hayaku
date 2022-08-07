@@ -14,7 +14,19 @@ function request($key = false)
 
     return false;
 }
-
+function response ($response, $data, $headers = [])
+{
+    foreach ($headers as $key => $value)
+    {
+        $response->header($key, $value);
+    }
+    if(gettype($data) !== 'string')
+    {
+        $data = json_encode($data);
+        $response->header('Content-Type', 'application/json');
+    }
+    $response->end($data);
+}
 
 if(!function_exists('__env'))
 {
@@ -40,6 +52,5 @@ function getStaticFile($request, $response) : bool
     }
     $response->header('Content-Type', mime_content_type($staticFile));
     $response->sendfile($staticFile);
-    $request->ended = true;
     return true;
 }

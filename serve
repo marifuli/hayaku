@@ -3,6 +3,7 @@ require './vendor/autoload.php';
 require './app/boot.php'; 
 require './routes/api.php';
 
+
 $server = new Swoole\HTTP\Server("127.0.0.1", 8081);
 
 $server->on("start", function (Swoole\Http\Server $server) {
@@ -10,24 +11,23 @@ $server->on("start", function (Swoole\Http\Server $server) {
 });
 
 $server->on("request", function (Swoole\Http\Request $req, Swoole\Http\Response $res) {
-    $ended = false;
-    try {
-        // define('RESPONSE', $response);
-        // $response = $res;
-        // $request = $req;
-        // $method = $req->server['request_method'];
-        // var_dump($method);exit;
-        run_api($req, $res);
-        if (getStaticFile($req, $res)) {
-            return;
-        }
-        var_dump($req->ended);
-        if(!$ended)
-        {
-            $res->end('404 - Not Found!');
-        }
-    } catch (\Throwable $th) {
-        var_dump($th);
+
+    // create the router
+    $router = new Route($req, $res);
+    
+    // run the api routes
+    run_api($router);
+    /**Add more routes here, iif you need */
+
+    //- serve static contents
+    if (getStaticFile($req, $res)) return;
+
+    // Serve the 404 page
+    if($router->is_ended() === false)
+    {
+        $res->status(404);
+        response($res, '404 - Not Found');
     }
+
 });
 $server->start();

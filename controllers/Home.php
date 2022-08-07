@@ -5,18 +5,12 @@ use Models\Anime;
 
 class Home 
 {
-    public function index($req, $res)
+    static function index($req, $res)
     {
-        return 'Hello world!';
-        // return Anime::table()->limit(10)->get();
+        response($res, 'Hello world = ' . time());
     }
-    public function index2($req, $res)
+    static function hi($req, $res)
     {
-        // return 'Hello world!';
-        return Anime::table()->limit(10)->get();
-    }
-    public function latest()
-    {
-        $page = request('page');
+        return response($res, Anime::table()->limit(1)->get());
     }
 }

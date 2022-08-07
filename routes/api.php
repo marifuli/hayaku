@@ -1,12 +1,11 @@
 <?php
-function run_api($req, $res) {
 
-    Route::get('/hi', [Controllers\Home::class, 'index'], $req, $res);
-    Route::get('/hi/(:any)', [Controllers\Home::class, 'index2'], $req, $res);
+use Controllers\Home;
 
-    // Route::get('/(:any)', function($hi)
-    // {
-        
-    // }, $req, $res);
+function run_api(Route $router) {
+
+    $router->get('/', fn ($req, $res) => Home::index($req, $res));
+    $router->get('hi', fn ($req, $res) => Home::hi($req, $res));
+    $router->get('hii/(:any)', fn ($req, $res, $data) => $res->end('What the ' . $data));
 
 }

@@ -4,7 +4,7 @@ namespace Models;
  
 class Anime
 {
-    static $table = 'animes';
+    static $table = 'users';
 
     static function table()
     {
