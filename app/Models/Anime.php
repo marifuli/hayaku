@@ -1,10 +1,10 @@
 <?php
 
-namespace Models;
+namespace App\Models;
  
-class Episode
+class Anime
 {
-    static $table = 'episodes';
+    static $table = 'users';
 
     static function table()
     {

@@ -1,13 +1,13 @@
 <?php
-namespace Controllers;
+namespace App\Controllers;
 
-use Models\Anime;
+use \App\Models\Anime;
 
 class Home 
 {
     static function index($req, $res)
     {
-        response($res, 'Hello world = ' . time());
+        response($res, 'Hello world = ' . time() . __env('name'));
     }
     static function hi($req, $res)
     {

@@ -28,20 +28,6 @@ function response ($response, $data, $headers = [])
     $response->end($data);
 }
 
-if(!function_exists('__env'))
-{
-    function __env($key = false)
-    {
-        $env = include('env.php');
-        if($key === false)
-        {
-            return $env;
-        }else 
-        {
-            return $env[$key] ?? false;
-        }
-    }    
-}
 
 function getStaticFile($request, $response) : bool 
 {

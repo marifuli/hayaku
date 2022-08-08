@@ -1,33 +1,7 @@
 <?php
-require './vendor/autoload.php';
-require './app/boot.php'; 
-require './routes/api.php';
+define('APP_PATH', __DIR__ . '/');
+
+require APP_PATH . 'vendor/autoload.php';
+require APP_PATH . 'core/boot.php'; 
 
 
-$server = new Swoole\HTTP\Server("127.0.0.1", 8081);
-
-$server->on("start", function (Swoole\Http\Server $server) {
-    echo "Swoole http server is started at http://127.0.0.1:8081\n";
-});
-
-$server->on("request", function (Swoole\Http\Request $req, Swoole\Http\Response $res) {
-
-    // create the router
-    $router = new Route($req, $res);
-    
-    // run the api routes
-    run_api($router);
-    /**Add more routes here, iif you need */
-
-    //- serve static contents
-    if (getStaticFile($req, $res)) return;
-
-    // Serve the 404 page
-    if($router->is_ended() === false)
-    {
-        $res->status(404);
-        response($res, '404 - Not Found');
-    }
-
-});
-$server->start();
