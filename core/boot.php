@@ -10,19 +10,20 @@ require APP_PATH . 'core/Request.php';
 require APP_PATH . 'core/Response.php';
 
 $env_data = include(APP_PATH . 'env.php');
-function __env($key, $default = null) {
-    return $env_data[$key] ?? $default;
+function env_data($key, $defult= false)
+{
+    return $GLOBALS['env_data'][$key] ?? $defult;
 }
 /**
  * Setting up the DB Connection
  */
 $capsule = new \Illuminate\Database\Capsule\Manager;
 $capsule->addConnection([
-    'driver'   => 'mysql',
-    'host'     => 'localhost:3306',
-    'database' => 'cryanime',
-    'username' => 'root',
-    'password' => '12345678',
+    'driver'   => env_data('database')['driver'],
+    'host'     => env_data('database')['host'],
+    'database' => env_data('database')['name'],
+    'username' => env_data('database')['user'],
+    'password' => env_data('database')['password'],
     'charset'   => 'utf8',
     'collation' => 'utf8_unicode_ci',
     'prefix'   => '',
