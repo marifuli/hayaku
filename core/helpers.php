@@ -18,21 +18,21 @@ function response ($response, $data, $headers = [])
 {
     foreach ($headers as $key => $value)
     {
-        $response->header($key, $value);
+        $response->main->header($key, $value);
     }
     if(gettype($data) !== 'string')
     {
         $data = json_encode($data);
-        $response->header('Content-Type', 'application/json');
+        $response->main->header('Content-Type', 'application/json');
     }
-    $response->end($data);
+    $response->main->end($data);
 }
 
 
 function getStaticFile($request, $response) : bool 
 {
     if( strlen($request->server['request_uri'] < 2) ) return false;
-    $staticFile = __DIR__ .'/../static'. $request->server['request_uri'];
+    $staticFile = APP_PATH . 'public'. $request->server['request_uri'];
     if (! file_exists($staticFile)) {
         return false;
     }

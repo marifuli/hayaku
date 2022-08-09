@@ -6,6 +6,8 @@ use App\Routes\Web;
 require APP_PATH . 'core/helpers.php';
 require APP_PATH . 'core/routing/Route.php';
 require APP_PATH . 'core/routing/Router.php';
+require APP_PATH . 'core/Request.php';
+require APP_PATH . 'core/Response.php';
 
 $env_data = include(APP_PATH . 'env.php');
 function __env($key, $default = null) {
@@ -38,16 +40,17 @@ $capsule->setAsGlobal();
 
 
 
-$server = new Swoole\HTTP\Server("127.0.0.1", 8081);
+$server = new Swoole\HTTP\Server("127.0.0.1", 8082);
 
 $server->on("start", function (Swoole\Http\Server $server) {
     echo "Swoole http server is started at http://127.0.0.1:8081\n";
 });
 
 $server->on("request", function (Swoole\Http\Request $req, Swoole\Http\Response $res) {
-
+    $request = new Request($req);
+    $response = new Response($res);
     // create the router
-    $router = new Route($req, $res);
+    $router = new Route($request, $response);
     
     // run the api routes
     Api::run($router);

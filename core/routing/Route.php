@@ -7,7 +7,7 @@ class Route
     public $response = null;
     public $router = null;
 
-    public function __construct(Swoole\Http\Request $request, Swoole\Http\Response $response)
+    public function __construct(Request $request, Response $response)
     {
         $this->response = $response;
         $this->request = $request;

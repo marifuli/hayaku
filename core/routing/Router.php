@@ -26,7 +26,7 @@ class Router
     public $request = null;
     public $response = null;
 
-    public function __construct(Swoole\Http\Request $request, Swoole\Http\Response $response)
+    public function __construct(Request $request, Response $response)
     {
         $this->response = $response;
         $this->request = $request;
@@ -40,10 +40,10 @@ class Router
     public function uri()
     {
         
-        if (isset($this->request->server['request_uri']))
+        if (isset($this->request->main->server['request_uri']))
         {
             // Detect using request_uri, this works in most situations.
-            $this->uri = $this->request->server['request_uri'];
+            $this->uri = $this->request->main->server['request_uri'];
             
             // Remove the query string.
             if (($pos = strpos($this->uri, '?')) !== false)
@@ -51,10 +51,10 @@ class Router
                 $this->uri = substr($this->uri, 0, $pos);
             }
         }
-        else if (isset($this->request->server['path_info']))
+        else if (isset($this->request->main->server['path_info']))
         {
             // Detect URI using path_info
-            $this->uri = $this->request->server['path_info'];
+            $this->uri = $this->request->main->server['path_info'];
         }
         
         // Remove leading and trailing slashes
@@ -75,7 +75,7 @@ class Router
      */
     public function method()
     {
-        return strtoupper($this->request->server['request_method']);
+        return strtoupper($this->request->main->server['request_method']);
     }
 
     /**
